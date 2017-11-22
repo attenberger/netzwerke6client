@@ -1,6 +1,5 @@
 package edu.hm.cs.capacitymeasuring;
 
-import java.net.DatagramPacket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -26,10 +25,10 @@ public class Package {
 			throw new IllegalArgumentException("The message is to long. It is possible to send up to " + DATASIZE + " Bytes.");
 	}
 	
-	public DatagramPacket getDatagramPackage() {
+	public byte[] getMessage() {
 		ByteBuffer buffer = ByteBuffer.allocate(SEQUENZNUMBERSIZE + DATASIZE);
 		buffer.putShort(sequenznumber);
 		buffer.put(data);
-		return new DatagramPacket(buffer.array(), SEQUENZNUMBERSIZE + DATASIZE);
+		return buffer.array();
 	}
 }

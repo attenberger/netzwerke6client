@@ -3,19 +3,20 @@ package edu.hm.cs.capacitymeasuring;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Date;
+
+import edu.hm.cs.capacitymeasuring.sender.Sender;
+import edu.hm.cs.capacitymeasuring.sender.TCPSender;
+import edu.hm.cs.capacitymeasuring.sender.UDPSender;
 
 public class Client {
 
+	private static final String ASKTCP_UDP = "Soll TCP oder UDP verwendet werden? ";
+	private static final String NOTTCPORUDPENTERED = "Es wurde weder \"TCP\" noch \"UDP\" eingegeben!";
 	private static final String ASKFORIP = "Bitte geben Sie die IP-Adresse des Servers ein: ";
 	private static final String NOTICETHATTHEIPWASINVALID = "Es wurde keine gültige IP-Adresse eingegen!";
 	private static final String ASKFORPORT = "Bitte geben Sie den Port des Servers ein: ";
@@ -29,7 +30,7 @@ public class Client {
 	
 	private static int sentPackages = 0;
 	
-	private static SocketAddress socketaddress;
+	private static Sender sender = null;
 	private static int sendtime_millisec = -1;
 	private static int delaydistance = -1;
 	private static int delay_millisec = -1;
@@ -37,18 +38,16 @@ public class Client {
 	public static void main(String[] args) {
 		readParameter();
 		try {
-			DatagramSocket socket = new DatagramSocket();
-			socket.connect(socketaddress);
 			long starttime = new Date().getTime();
 			while (sendtime_millisec > new Date().getTime() - starttime) {
-				socket.send(new Package().getDatagramPackage());
+				sender.send(new Package().getMessage());
 				sentPackages++;
 				
 				if (delaydistance != 0 && sentPackages % delaydistance == 0)
 					Thread.sleep(delay_millisec);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Fehler beim Senden der Daten! " + e.getMessage());
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
@@ -85,8 +84,20 @@ public class Client {
 					System.out.print(ASKFORPORT);
 				}
 			} 
-			socketaddress = new InetSocketAddress(ip, port);
+			SocketAddress socketaddress = new InetSocketAddress(ip, port);
 			
+			System.out.print(ASKTCP_UDP);
+			while (sender == null) {
+				String input = reader.readLine();
+				if (input.equals("UDP")) {
+					sender = new UDPSender(socketaddress);
+				} else if (input.equals("TCP")) {
+					sender = new TCPSender(socketaddress);
+				} else {
+					System.out.println(NOTTCPORUDPENTERED);
+					System.out.print(ASKTCP_UDP);
+				}
+			} 
 			
 			System.out.print(ASKHOWLONGTOSEND);
 			while (sendtime_millisec < 0) {
