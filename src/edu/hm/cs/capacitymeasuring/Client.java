@@ -55,7 +55,7 @@ public class Client {
 	}
 	
 	private static float calculateSpeed() {
-		return ((Package.DATASIZE + Package.SEQUENZNUMBERSIZE) * sentPackages) / (float)sendtime_millisec;
+		return ((Package.DATASIZE + Package.SEQUENZNUMBERSIZE) * sentPackages) / (float) (sendtime_millisec / 1000);
 	}
 	
 	private static void readParameter() {
