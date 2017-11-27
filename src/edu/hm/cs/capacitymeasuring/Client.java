@@ -86,19 +86,6 @@ public class Client {
 			} 
 			SocketAddress socketaddress = new InetSocketAddress(ip, port);
 			
-			System.out.print(ASKTCP_UDP);
-			while (sender == null) {
-				String input = reader.readLine();
-				if (input.equals("UDP")) {
-					sender = new UDPSender(socketaddress);
-				} else if (input.equals("TCP")) {
-					sender = new TCPSender(socketaddress);
-				} else {
-					System.out.println(NOTTCPORUDPENTERED);
-					System.out.print(ASKTCP_UDP);
-				}
-			} 
-			
 			System.out.print(ASKHOWLONGTOSEND);
 			while (sendtime_millisec < 0) {
 				try {
@@ -135,6 +122,19 @@ public class Client {
 				} catch (NumberFormatException e) {
 					System.out.println(NO_OR_NEGATIVENUMBERENTERED);
 					System.out.print(ASKDELAYLENGHT);
+				}
+			} 
+			
+			System.out.print(ASKTCP_UDP);
+			while (sender == null) {
+				String input = reader.readLine();
+				if (input.equals("UDP")) {
+					sender = new UDPSender(socketaddress);
+				} else if (input.equals("TCP")) {
+					sender = new TCPSender(socketaddress);
+				} else {
+					System.out.println(NOTTCPORUDPENTERED);
+					System.out.print(ASKTCP_UDP);
 				}
 			} 
 			
