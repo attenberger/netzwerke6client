@@ -25,10 +25,9 @@ public class Client {
 	private static final String ASKHOWOFTENTODELAY = "Alle wie viele Packete soll ein Verzögerung eingefügt werden? ";
 	private static final String NO_OR_NEGATIVENUMBERENTERED = "Die Eingabe war weder eine positive Zahl noch \"0\"!";
 	private static final String ASKDELAYLENGHT = "Wie viele Millisekunden soll verzögert werden? ";
-	private static final String REACHEDSPEED = "Es wurde eine Datenrate von %f B/s erreicht.";
+	private static final String REACHEDSPEED = "Es wurde eine Datenrate von %f B/s erreicht. Des wurden %d Packete gesendet.";
 	
-	
-	private static int sentPackages = 0;
+
 	
 	private static Sender sender = null;
 	private static int sendtime_millisec = -1;
@@ -37,25 +36,31 @@ public class Client {
 	
 	public static void main(String[] args) {
 		readParameter();
+		int sentPackages = 0;
+		long starttime = 0;
+		long stoptime = 0;
 		try {
-			long starttime = new Date().getTime();
+			starttime = new Date().getTime();
 			while (sendtime_millisec > new Date().getTime() - starttime) {
-				sender.send(new Package().getMessage());
+				byte[] binaryMessage = new Package().getMessage();
+				sender.send(binaryMessage);
+//				System.out.println(Arrays.toString(binaryMessage));
 				sentPackages++;
 				
 				if (delaydistance != 0 && sentPackages % delaydistance == 0)
 					Thread.sleep(delay_millisec);
 			}
+			stoptime = new Date().getTime();
 		} catch (IOException e) {
 			System.out.println("Fehler beim Senden der Daten! " + e.getMessage());
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-		System.out.printf(REACHEDSPEED, calculateSpeed());
+		System.out.printf(REACHEDSPEED, calculateSpeed(sentPackages, starttime, stoptime), sentPackages);
 	}
 	
-	private static float calculateSpeed() {
-		return ((Package.DATASIZE + Package.SEQUENZNUMBERSIZE) * sentPackages) / (float) (sendtime_millisec / 1000);
+	private static float calculateSpeed(int sentpackages, long starttime, long stoptime) {
+		return ((Package.DATASIZE + Package.SEQUENZNUMBERSIZE) * sentpackages) / (float) ((stoptime - starttime) / 1000);
 	}
 	
 	private static void readParameter() {

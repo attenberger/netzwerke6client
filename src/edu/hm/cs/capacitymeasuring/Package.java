@@ -8,7 +8,7 @@ public class Package {
 	public final static int SEQUENZNUMBERSIZE = 2;
 	public final static int DATASIZE = 1398;
 	
-	private static short nextsequenznumber = 32767;
+	private static short nextsequenznumber = 0;
 	private final short sequenznumber;
 	private final byte[] data;
 	
